@@ -17,7 +17,7 @@ app.use(express.json());
 let aiClient: GoogleGenAI | null = null;
 function getGeminiClient(): GoogleGenAI {
   if (!aiClient) {
-    const key = process.env.GEMINI_API_KEY;
+    const key = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY1;
     if (!key) {
       console.warn("WARNING: GEMINI_API_KEY is not defined in the environment variables!");
     }
@@ -111,9 +111,9 @@ app.post("/api/chat", async (req, res) => {
     }
 
     const ai = getGeminiClient();
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY1) {
       return res.status(500).json({ 
-        error: "Serverda GEMINI_API_KEY mavjud emas. Iltimos, Secrets panelidan kalitni qo'shing." 
+        error: "Serverda GEMINI_API_KEY yoki GEMINI_API_KEY1 mavjud emas. Iltimos, Secrets panelidan kalitni qo'shing." 
       });
     }
 
