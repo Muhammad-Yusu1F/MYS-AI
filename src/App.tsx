@@ -760,24 +760,10 @@ export default function App() {
     // Attached files snapshot
     const currentAttachments = [...attachedFiles];
 
-    // Rich message with files context for model
-    let richContent = text.trim();
-    if (currentAttachments.length > 0) {
-      richContent += "\n\n---\n**Attached Files Context:**";
-      currentAttachments.forEach((f) => {
-        if (f.type === "image") {
-          // If it's a base64 image representation
-          richContent += `\n- **[Rasm / Photo]:** "${f.name}" (${f.size})\n[Image Data: ${f.content.substring(0, 60000)}${f.content.length > 60000 ? "... [TRUNCATED]" : ""}]`;
-        } else {
-          richContent += `\n- **[Fayl / Document]:** "${f.name}" (${f.size})\nContent:\n\`\`\`\n${f.content}\n\`\`\``;
-        }
-      });
-    }
-
     const userMsg: Message = {
       id: `msg_u_${Date.now()}`,
       role: "user",
-      content: richContent,
+      content: text.trim(),
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       attachedFiles: currentAttachments.length > 0 ? currentAttachments : undefined
     };

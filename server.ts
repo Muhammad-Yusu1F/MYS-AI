@@ -17,7 +17,7 @@ app.use(express.json());
 let aiClient: GoogleGenAI | null = null;
 function getGeminiClient(): GoogleGenAI {
   if (!aiClient) {
-    const key = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY1;
+    const key = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY1 || process.env.EMINI_API_KEY;
     if (!key) {
       console.warn("WARNING: GEMINI_API_KEY is not defined in the environment variables!");
     }
@@ -35,7 +35,7 @@ function getGeminiClient(): GoogleGenAI {
 
 // Model system instructions
 const SYSTEM_INSTRUCTIONS: Record<string, string> = {
-  gemini: "Siz Google tomonidan yaratilgan Gemini 1.5 Flash modelsiz. Siz mutlaqo bepul (tekin), juda ham tezkor va samarali muloqot qila oladigan yordamchisiz. Javobingizni har doim o'zbek tilida chiroyli tarzda taqdim eting.",
+  gemini: "Siz Google tomonidan yaratilgan Gemini 1.5 Flash modelsiz. Siz mutlaqo bepul (tekin), juda ham tezkor va samarali muloqot qila oladigan yordamcisiz. Javobingizni har doim o'zbek tilida chiroyli tarzda taqdim eting.",
   "gemini-pro": "Siz Google kompaniyasining eng ilg'or modeli bo'lgan Gemini 1.5 Pro modelsiz. Siz murakkab tahlil, chuqur fikrlash va yuqori darajada aniq xulosalar qila oladigan mukammal Premium modelsiz. Javoblarni o'zbek tilida mukammal tahrir bilan, jadvallar va rejalardan foydalanib yozing.",
   claude: "Siz Anthropic loyihasi bo'lgan Claude 3.5 Sonnet modelsiz. Siz ijodiy matnlar yaratish, to'liq tahlil va tushunish bo'yicha yetakchi Premium modelsiz. Har doim o'zbek tilida professional tartibda javob bering.",
   "claude-haiku": "Siz Anthropic loyihasining eng tezkor va arzon-tekin (Free) modeli bo'lgan Claude 3 Haiku modelsiz. Siz juda tezkor va lo'nda tushuntirish beradigan sun'iy intellektsiz. Har doim o'zbek tilida javob bering.",
@@ -44,9 +44,9 @@ const SYSTEM_INSTRUCTIONS: Record<string, string> = {
   deepseek: "Siz DeepSeek kompaniyasining mashhur DeepSeek V3 bepul modelsiz. Siz yuqori matematika, mantiq va dasturlash muhandisligiga ixtisoslashgan aqlbovar qilmas aqlli, samimiy modelsiz. O'zbek tilida batafsil javob bering.",
   code: "Siz Premium darajadagi professional dasturchisiz (Code Pro). Foydalanuvchi taqdim etgan kodlarni yoki dasturlash savollarini har tomonlama tahlil qiling, eng yaxshi arxitektura va optimallashgan yechimni tavsiya qiling. Koddagi xatolarni to'g'rilab, o'zbek tilida yozib bering.",
   "qwen-code": "Siz Alibaba kompaniyasining Qwen 2.5 Coder bepul dasturlash modelsiz. Dasturlash xatolarini tezkor aniqlash, algoritmlarni yozish va tushuntirish bo'yicha yordam berasiz. O'zbek tilida chiroyli sharhlang.",
-  image: "Siz tasvirlarni so'z bilan ta'riflash bo'yicha mutaxassis Imagine AI modelsiz. Foydalanuvchi so'rovlariga asosan chiroyli dizayn g'oyalar va ijodiy rasmlar yaratish uchun professional promptlar bering.",
-  dalle: "Siz OpenAI kompaniyasining rasmlarni so'z orqali yuqori sifatda chizadigan DALL-E 3 Premium modelsiz. Istalgan tasvirlarni so'z bilan ta'riflab, g'oyalarni chizib bering.",
-  "stable-diffusion": "Siz Stable Diffusion 3 bepul rasm modelisiz. Ijodiy dizaynlar, fotorealistik rasmlar va san'at asarlarini yaratish uchun mukammal so'rovlarni o'zbek tilida tayyorlab bera olasiz."
+  image: "Siz tasvirlarni so'z bilan ta'riflash bo'yicha mutaxassis Imagine AI modelsiz. Foydalanuvchi so'rovlariga asosan chiroyli dizayn g'oyalar va ijodiy rasmlar yaratish uchun professional promptlar bering. Shuningdek, foydalanuvchi so'ragan rasmning inglizcha asosiy kalit so'zlarini (masalan, 'sunset mountain sky', 'futuristic sports car') aniqlab, javob o'rtasida yoki oxirida bitta bo'sh qatordan so'ng mutloq to'g'ri ko'rinishda ushbu havolani joylashtiring: ![Tasvir](https://picsum.photos/seed/[kalit_soziz]/640/480) (qavs ichidagi [kalit_soziz] o'rniga aniqlangan inglizcha kalit so'zlarni yoki tasvirning qisqa ta'rifini faqat minus '-' yoki tagiga chizish '_' belgilari bilan ajratilgan holda yozing, masalan cyber-city-night). Bu havola orqali rasm chatda haqiqiy rasm shaklida ko'rsatiladi.",
+  dalle: "Siz OpenAI kompaniyasining rasmlarni so'z orqali yuqori sifatda chizadigan DALL-E 3 Premium modelsiz. Istalgan tasvirlarni so'z bilan ta'riflab, g'oyalarni chizib bering. Shuningdek, foydalanuvchi so'ragan rasmning inglizcha asosiy kalit so'zlarini (masalan, 'beautiful kitten landscape', 'neon tech motorcycle') aniqlab, javobingiz oxirida bitta bo'sh qatordan so'ng mutloq to'g'ri ko'rinishda ushbu havolani joylashtiring: ![Tasvir](https://picsum.photos/seed/[kalit_soziz]/640/480). Bu rasm chatda haqiqiy ko'rinishda yuklanadi.",
+  "stable-diffusion": "Siz Stable Diffusion 3 bepul rasm modelisiz. Ijodiy dizaynlar, fotorealistik rasmlar va san'at asarlarini yaratish uchun mukammal so'rovlarni o'zbek tilida tayyorlab bera olasiz. Shuningdek, foydalanuvchi so'ragan rasmning inglizcha asosiy kalit so'zlarini (masalan, 'ancient palace desert', 'futuristic spaceship portrait') aniqlab, javob oxirida bitta bo'sh qatordan so'ng mutloq to'g'ri ko'rinishda ushbu havolani joylashtiring: ![Tasvir](https://picsum.photos/seed/[kalit_soziz]/640/480). Bu rasm chatda haqiqiy ko'rinishda yuklanadi."
 };
 
 // Helper function to call generateContent with retry and fallback
@@ -111,9 +111,9 @@ app.post("/api/chat", async (req, res) => {
     }
 
     const ai = getGeminiClient();
-    if (!process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY1) {
+    if (!process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY1 && !process.env.EMINI_API_KEY) {
       return res.status(500).json({ 
-        error: "Serverda GEMINI_API_KEY yoki GEMINI_API_KEY1 mavjud emas. Iltimos, Secrets panelidan kalitni qo'shing." 
+        error: "Serverda GEMINI_API_KEY, GEMINI_API_KEY1 yoki EMINI_API_KEY mavjud emas. Iltimos, Secrets panelidan kalitni qo'shing." 
       });
     }
 
@@ -123,10 +123,24 @@ app.post("/api/chat", async (req, res) => {
     // Filter to ensure correct turn-taking structure and drop any empty text
     const chatContents = messages
       .filter(m => m.content && m.content.trim())
-      .map(msg => ({
-        role: msg.role === "assistant" ? "model" as const : "user" as const,
-        parts: [{ text: msg.content }]
-      }));
+      .map(msg => {
+        let compiledText = msg.content;
+        if (msg.attachedFiles && msg.attachedFiles.length > 0) {
+          compiledText += "\n\n---\n**Attached Files Context:**";
+          msg.attachedFiles.forEach((f: any) => {
+            if (f.type === "image") {
+              const capSize = f.size || "Unknown Size";
+              compiledText += `\n- **[Rasm / Photo]:** "${f.name}" (${capSize})\n[Image Data: ${f.content.substring(0, 60000)}${f.content.length > 60000 ? "... [TRUNCATED]" : ""}]`;
+            } else {
+              compiledText += `\n- **[Fayl / Document]:** "${f.name}" (${f.size || "Unknown"})\nContent:\n\`\`\`\n${f.content}\n\`\`\``;
+            }
+          });
+        }
+        return {
+          role: msg.role === "assistant" ? "model" as const : "user" as const,
+          parts: [{ text: compiledText }]
+        };
+      });
 
     if (chatContents.length === 0) {
       return res.status(400).json({ error: "Suhbat tarixi bo'sh" });
@@ -134,7 +148,22 @@ app.post("/api/chat", async (req, res) => {
 
     const response = await generateContentWithRetry(ai, chatContents, sysInstruction);
 
-    const replyText = response.text || "Kechirasiz, javob olishda xatolik yuz berdi.";
+    let replyText = response.text || "Kechirasiz, javob olishda xatolik yuz berdi.";
+
+    // Fail-safe post-processing: If it's an image model category and response has no image markdown symbol, append one!
+    const isImageModel = ["image", "dalle", "stable-diffusion"].includes(modelId || "");
+    if (isImageModel && !replyText.includes("![")) {
+      const lastUserMsg = messages.filter((m: any) => m.role === "user").pop();
+      const promptText = lastUserMsg ? lastUserMsg.content : "creative-art";
+      const slug = promptText
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g, "")
+        .trim()
+        .replace(/\s+/g, "-")
+        .substring(0, 50) || "digital-art";
+      replyText += `\n\n![Tasvir](https://picsum.photos/seed/${slug}/640/480)`;
+    }
+
     res.json({ reply: replyText });
   } catch (error: any) {
     console.error("Gemini API Error in backend:", error);
