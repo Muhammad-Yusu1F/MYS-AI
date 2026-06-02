@@ -1,0 +1,6 @@
+{
+  "name": "MYS AI",
+  "description": "Barcha AI modellar bir joyda. Gemini, Claude, ChatGPT va boshqa eng kuchli sun'iy intellekt modellari bilan muloqot qiling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
