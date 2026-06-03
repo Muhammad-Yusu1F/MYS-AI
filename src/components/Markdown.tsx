@@ -140,7 +140,30 @@ function TextBlock({ text }: TextBlockProps) {
           );
         }
 
-        // 4. Default Paragraph
+        // 4. Check for Image Markdown: ![alt](url)
+        const imgMatch = trimmed.match(/!\[(.*?)\]\((.*?)\)/);
+        if (imgMatch) {
+          const alt = imgMatch[1];
+          const src = imgMatch[2];
+          return (
+            <div key={lineIdx} className="my-3 overflow-hidden rounded border border-[var(--border-color)] bg-[#121317]/50 max-w-xl shadow-lg">
+              <div className="relative w-full h-[320px] bg-black/60 flex items-center justify-center">
+                <img
+                  src={src}
+                  alt={alt}
+                  className="max-w-full max-h-[300px] object-contain hover:scale-[1.02] transition-transform duration-300"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div className="px-3.5 py-2 border-t border-[var(--border-color)] bg-black/40 text-[10px] font-mono text-[var(--text-muted)] flex justify-between items-center">
+                <span>Sintezlangan Portret / Rasm</span>
+                <span className="text-emerald-400 font-semibold">{alt || "AI Image"}</span>
+              </div>
+            </div>
+          );
+        }
+
+        // 5. Default Paragraph
         if (trimmed === "") {
           return <div key={lineIdx} className="h-2" />;
         }
